@@ -10,17 +10,23 @@ A modern, responsive website for Mechanic Africa - Professional Auto Services wi
 - 🎨 **Modern UI/UX** - Clean, professional automotive industry design
 - 📧 **Contact Form** - Lead generation with validation and spam protection
 - 🤖 **reCAPTCHA Protection** - Prevents bots and spam submissions
-- � **SQLite Database** - Secure storage of contact submissions
+- 💾 **SQLite Database** - Secure storage of contact submissions
 - 📊 **Admin Dashboard** - View and manage all form submissions
-- 🔒 **Security Features** - SQL injection prevention, XSS protection, secure headers
+- 👥 **User Management** - Add/edit/delete admin users with role-based access
+- 🔐 **Secure Authentication** - Login system with session management and remember me
+- �️ **Role-Based Access** - Super Admin, Admin, and Viewer roles with different permissions
+- 📝 **Activity Logging** - Track all admin actions and login attempts
+- �🔒 **Security Features** - SQL injection prevention, XSS protection, secure headers
 - ⚡ **Fast Loading** - Optimized CSS, JavaScript, and caching
-- � **Shared Hosting Ready** - Works on any PHP hosting provider
+- 🚀 **Shared Hosting Ready** - Works on any PHP hosting provider
 
 ## 📋 Table of Contents
 
 - [Quick Start](#quick-start)
 - [Local Development](#local-development)
 - [Production Deployment](#production-deployment)
+- [Authentication System](#authentication-system)
+- [User Management](#user-management)
 - [reCAPTCHA Setup](#recaptcha-setup)
 - [File Structure](#file-structure)
 - [Configuration](#configuration)
@@ -41,7 +47,10 @@ A modern, responsive website for Mechanic Africa - Professional Auto Services wi
 2. Get reCAPTCHA keys from Google
 3. Configure `config.php` with your keys
 4. Upload to your web hosting
-5. Test the contact form
+5. **Initialize the database**: Visit `https://yourdomain.com/init-database.php`
+6. **Login to admin**: Use default credentials (admin/MechAdmin2025!)
+7. **Change default password** and create additional users
+8. Test the contact form
 
 ## 💻 Local Development
 
@@ -109,11 +118,158 @@ Ensure your hosting supports:
 - ✅ `file_get_contents()` function for CAPTCHA verification
 - ✅ Write permissions for database file creation
 
-### Step 4: Test Deployment
-1. Visit your domain: `https://yourdomain.com`
-2. Submit a test form entry
-3. Check admin panel: `https://yourdomain.com/admin.php`
-4. Verify CAPTCHA is working
+### Step 4: First Admin Setup
+1. **Initialize the database:**
+   ```
+   https://yourdomain.com/init-database.php
+   ```
+
+2. **Use default credentials:**
+   - **Primary Admin:** username `admin`, password `MechAdmin2025!`
+   - **Backup Admin:** username `mechanic_admin_1022`, password `MechAdmin2025!$#898`
+
+3. **Login and change passwords:**
+   ```
+   https://yourdomain.com/login.php
+   ```
+
+4. **Access admin dashboard:**
+   ```
+   https://yourdomain.com/admin.php
+   ```
+
+## 🔐 Authentication System
+
+### User Roles & Permissions
+
+| Role | Dashboard | User Management | Add Users | Delete Users |
+|------|-----------|-----------------|-----------|--------------|
+| **Super Admin** | ✅ | ✅ | All roles | ✅ |
+| **Admin** | ✅ | ✅ | Admin, Viewer | ✅ (not Super Admin) |
+| **Viewer** | ✅ | ❌ | ❌ | ❌ |
+
+### Login Features
+
+- 🔐 **Secure Authentication** - bcrypt password hashing
+- 🔒 **Session Management** - 8-hour secure sessions
+- 💾 **Remember Me** - 30-day auto-login option
+- 🛡️ **Brute Force Protection** - 5 attempts, 15-min lockout
+- 📊 **Activity Logging** - Track all admin actions
+- 🌐 **IP Monitoring** - Log IP addresses for security
+
+### Default Admin Account
+
+After database initialization, use these credentials:
+
+```
+Username: admin
+Password: MechAdmin2025!
+Role: Super Admin
+```
+
+### Additional Super Admin Account
+
+A second super admin account has been created for backup access:
+
+```
+Username: mechanic_admin_1022
+Password: MechAdmin2025!$#898
+Email: admin1022@mechanic-africa.com
+Role: Super Admin
+```
+
+⚠️ **IMPORTANT:** 
+- Change both default passwords immediately after first login!
+- Use the additional account as backup access
+- Create new admin users and disable defaults for production use
+
+### Password Requirements
+
+- ✅ Minimum 8 characters
+- ✅ At least one uppercase letter
+- ✅ At least one lowercase letter  
+- ✅ At least one number
+- ✅ At least one special character
+
+## 👥 User Management
+
+### Adding New Admin Users
+
+1. **Login as Admin or Super Admin**
+2. **Navigate to User Management**
+   ```
+   https://yourdomain.com/user-management.php
+   ```
+3. **Fill the "Add New User" form:**
+   - **Username:** Unique identifier
+   - **Email:** Valid email address
+   - **Password:** Must meet requirements
+   - **Role:** Choose appropriate access level
+
+4. **Click "Create User"**
+
+### Managing Existing Users
+
+#### Edit User Information
+- Update username, email, or role
+- Only Super Admins can create/edit other Super Admins
+- Cannot edit your own role if you're the only Super Admin
+
+#### Reset User Password
+- Generate new password for any user
+- User will be forced to login again
+- All active sessions for that user are revoked
+
+#### Enable/Disable Users
+- Temporarily disable user access
+- Disabled users cannot login
+- All active sessions are immediately revoked
+
+#### Delete Users
+- Soft delete (user marked as inactive)
+- Cannot delete your own account
+- Cannot delete the last Super Admin
+- All user sessions are revoked
+
+### Session Management
+
+#### Active Sessions
+- View all logged-in users
+- See login time and IP addresses
+- Monitor user activity
+
+#### Security Actions
+- **Revoke Individual Sessions:** Force logout specific users
+- **Revoke All Sessions:** Force logout all users except current
+- **Session Cleanup:** Automatic removal of expired sessions
+
+### Backup Admin Account
+
+For additional security and recovery access, a backup super admin account has been created:
+
+#### Backup Account Details
+- **Purpose:** Emergency access if primary admin is locked out
+- **Username:** `mechanic_admin_1022`
+- **Email:** `admin1022@mechanic-africa.com`
+- **Role:** Super Admin (full system access)
+
+#### When to Use Backup Account
+- Primary admin password forgotten
+- Primary admin account disabled/locked
+- Emergency system access needed
+- Administrative backup operations
+
+#### Security Best Practices
+1. **Change backup password** immediately after first use
+2. **Use different passwords** for primary and backup accounts
+3. **Monitor both accounts** in activity logs
+4. **Disable backup account** if not needed in production
+5. **Create new admin users** and disable defaults for live sites
+
+5. **Manage users (Admin+ only):**
+   ```
+   https://yourdomain.com/user-management.php
+   ```
 
 ## 🔐 reCAPTCHA Setup
 
@@ -174,7 +330,18 @@ mechanic-africa/
 ├── index.html                 # Static fallback
 ├── config.php                 # Configuration file
 ├── submit-form.php            # Form submission handler
-├── admin.php                  # Admin dashboard
+├── admin.php                  # Admin dashboard (protected)
+├── auth.php                   # Authentication handler
+├── auth-config.php            # Authentication configuration
+├── login.php                  # Admin login page
+├── user-management.php        # User management interface
+├── init-database.php          # Database initialization
+├── create-super-admin.php     # Backup admin creation (delete after use)
+├── login.php                  # Admin login page
+├── auth.php                   # Authentication handler
+├── auth-config.php            # Authentication configuration
+├── user-management.php        # User management (Admin+ only)
+├── init-database.php          # Database initialization
 ├── styles.css                 # CSS styles
 ├── script.js                  # JavaScript functionality
 ├── mechanic-africa.jpeg       # Hero image
@@ -238,31 +405,96 @@ ExpiresByType image/* "access plus 1 year"
 
 ## 📊 Admin Panel
 
-### Access
-Visit: `https://yourdomain.com/admin.php`
+### First-Time Setup
+1. **Initialize Database:**
+   Visit: `https://yourdomain.com/init-database.php`
+   - Creates admin users table
+   - Sets up default admin account
+   - Displays default login credentials
 
-### Features
+2. **Default Admin Credentials:**
+   - **Username:** `admin`
+   - **Password:** `MechAdmin2025!`
+   - **Email:** `admin@mechanic-africa.com`
+   - **⚠️ IMPORTANT:** Change the default password immediately after first login!
+
+### Admin Access Levels
+
+#### 🔴 Super Admin
+- Full system access
+- Can create/edit/delete all users
+- Can assign any role including Super Admin
+- Cannot delete their own account
+- Can view all admin activity logs
+
+#### 🔵 Admin  
+- Can create/edit/delete users (except Super Admins)
+- Can assign Admin and Viewer roles
+- Can view form submissions
+- Can manage user accounts
+- Access to user management panel
+
+#### 🟢 Viewer
+- Can only view form submissions
+- Cannot create or manage users
+- Read-only access to dashboard
+- Cannot modify any settings
+
+### Authentication Features
+
+#### 🔐 Security Features
+- **Secure Sessions** - HTTPOnly, Secure, SameSite cookies
+- **Password Requirements** - 8+ chars, uppercase, lowercase, numbers, special chars
+- **Rate Limiting** - 5 failed attempts = 15-minute lockout
+- **Remember Me** - Secure 30-day token authentication
+- **Session Timeout** - 8-hour automatic logout
+- **Activity Logging** - All admin actions tracked with IP and timestamp
+- **SQL Injection Protection** - PDO prepared statements
+- **XSS Prevention** - Input sanitization and validation
+
+#### 🚪 Login Process
+1. Visit: `https://yourdomain.com/login.php`
+2. Enter username and password
+3. Optional: Check "Remember me" for 30-day access
+4. Redirected to admin dashboard
+5. Session automatically refreshes on activity
+
+### Admin Panel Features
 - **Statistics Dashboard** - Total submissions, today, this week
+- **User Management** - Add/edit/delete admin users (Admin+ only)
 - **Submissions Table** - Name, email, car info, date, IP address
+- **Activity Logging** - Track all admin actions
+- **Session Management** - Monitor and revoke user sessions
 - **Responsive Design** - Works on mobile devices
-- **Data Export Ready** - Easy to copy/export data
+- **Secure Logout** - Destroys sessions and remember tokens
 
-### Admin Panel Screenshot
-The admin panel displays:
-- Real-time statistics
-- All form submissions in a clean table
-- Submission timestamps
-- Customer contact information
+### Security Features
 
-## 🛡️ Security Features
-
-### Form Protection
+#### Form Protection
 - ✅ **reCAPTCHA v2** - Human verification
 - ✅ **SQL Injection Prevention** - PDO prepared statements
 - ✅ **XSS Protection** - Input sanitization
 - ✅ **CSRF Protection** - Secure headers
 - ✅ **Input Validation** - Client and server-side
 - ✅ **Rate Limiting Ready** - Configuration prepared
+
+#### Authentication Security
+- ✅ **Password Hashing** - bcrypt with strong salts
+- ✅ **Session Security** - HttpOnly, Secure, SameSite cookies
+- ✅ **Brute Force Protection** - Failed attempt tracking and lockouts
+- ✅ **Activity Logging** - Complete audit trail of admin actions
+- ✅ **Role-Based Access** - Granular permission system
+- ✅ **Session Timeout** - Automatic logout after inactivity
+
+#### Production Security Checklist
+- [ ] Change all default passwords
+- [ ] Delete `create-super-admin.php` file
+- [ ] Delete `init-database.php` file (after setup)
+- [ ] Remove `test-form.html` file
+- [ ] Enable HTTPS/SSL certificate
+- [ ] Configure secure file permissions
+- [ ] Set up regular database backups
+- [ ] Monitor admin activity logs
 
 ### Database Security
 - ✅ **SQLite File Protection** - .htaccess access denial
@@ -312,13 +544,27 @@ The admin panel displays:
 - Check .htaccess syntax
 - Review hosting provider's file structure requirements
 
-#### 5. CSS/JavaScript Not Loading
-**Symptoms:** Page loads but styling/functionality missing
+#### 6. Authentication Issues
+**Symptoms:** Cannot login, session expired, access denied
 **Solutions:**
-- Clear browser cache (Ctrl+F5 or Cmd+Shift+R)
-- Check file paths in HTML
-- Verify files uploaded correctly
-- Test direct file access (e.g., `/styles.css`)
+- Try both admin accounts:
+  - Primary: `admin` / `MechAdmin2025!`
+  - Backup: `mechanic_admin_1022` / `MechAdmin2025!$#898`
+- Run database initialization: `/init-database.php`
+- Check SQLite support and write permissions
+- Clear browser cookies and try again
+- Verify session timeout settings (8 hours default)
+- Check if account is active (not disabled)
+- Ensure passwords haven't been changed without your knowledge
+
+#### 7. User Management Issues
+**Symptoms:** Cannot create users, permission denied
+**Solutions:**
+- Ensure logged in with Admin or Super Admin role
+- Check user role permissions (Viewer cannot manage users)
+- Verify password meets requirements (8+ chars, mixed case, numbers, special)
+- Ensure username/email is unique
+- Check database write permissions
 
 ### Debug Tools
 
@@ -436,9 +682,63 @@ You now have a fully functional, secure, and professional website for Mechanic A
 
 - ✅ **Beautiful responsive design**
 - ✅ **Spam-protected contact form**  
+- ✅ **Secure admin authentication system**
+- ✅ **Role-based user management**
+- ✅ **Activity logging and monitoring**
 - ✅ **Admin dashboard for managing leads**
 - ✅ **Production-ready security**
 - ✅ **Shared hosting compatibility**
+
+### 🚀 Getting Started
+
+1. **Initialize Database:** Visit `/init-database.php`
+2. **Login:** Use either admin account:
+   - Primary: `admin` / `MechAdmin2025!`
+   - Backup: `mechanic_admin_1022` / `MechAdmin2025!$#898`
+3. **Change Passwords:** Update both default credentials immediately
+4. **Add Users:** Create additional admin accounts
+5. **Start Collecting Leads:** Your contact form is ready!
+
+### 🔐 Super Admin Access Options
+
+**Primary Account:**
+```bash
+URL: https://yourdomain.com/login.php
+Username: admin
+Password: MechAdmin2025!
+```
+
+**Backup Account:**
+```bash
+URL: https://yourdomain.com/login.php
+Username: mechanic_admin_1022
+Password: MechAdmin2025!$#898
+```
+
+**Don't forget to change both default passwords!**
+
+## 🔑 Default Admin Access
+
+**After deployment, initialize your admin account:**
+
+1. **First visit:** `https://yourdomain.com/init-database.php`
+2. **Login with:** 
+   - Username: `admin`
+   - Password: `MechAdmin2025!`
+3. **Change password immediately** for security
+4. **Create additional users** as needed
+
+## 🛡️ Security Summary
+
+Your website includes enterprise-grade security:
+- 🔐 **Password hashing** with PHP's secure algorithms
+- 🛡️ **SQL injection prevention** via PDO prepared statements
+- 🚫 **XSS protection** through input sanitization
+- 📝 **Activity logging** for audit trails
+- ⏰ **Session management** with automatic timeouts
+- 🔄 **CSRF protection** via secure headers
+- 🚨 **Rate limiting** against brute force attacks
+- 🍪 **Secure cookies** with HTTPOnly and SameSite flags
 
 **Need help?** Follow the troubleshooting guide above or check the detailed setup guides in the `DEPLOYMENT.md` and `RECAPTCHA_SETUP.md` files.
 

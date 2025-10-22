@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Test - Mechanic Africa</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; max-width: 500px; margin: 0 auto; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        input { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #e74c3c; color: white; padding: 0.75rem 2rem; border: none; border-radius: 4px; cursor: pointer; }
+        .result { margin-top: 1rem; padding: 1rem; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>Form Submission Test</h1>
+    <p>This is a simple test page to debug form submission issues.</p>
+    
+    <form id="testForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="Test Browser User" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="browser.test@example.com" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="car">Car Information:</label>
+            <input type="text" id="car" name="car" value="2024 Browser Test Vehicle" required>
+        </div>
+        
+        <button type="submit">Submit Test Form</button>
+    </form>
+    
+    <div id="result"></div>
+    <div id="logs"></div>
+    
+    <script>
+        const form = document.getElementById('testForm');
+        const resultDiv = document.getElementById('result');
+        const logsDiv = document.getElementById('logs');
+        
+        function log(message) {
+            console.log(message);
+            logsDiv.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+        }
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            log('Form submission started');
+            resultDiv.innerHTML = '';
+            
+            const formData = new FormData(this);
+            const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                car: formData.get('car')
+            };
+            
+            log('Form data: ' + JSON.stringify(data));
+            
+            // Test with FormData
+            log('Sending with FormData...');
+            fetch('submit-form.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                log('Response status: ' + response.status);
+                log('Response ok: ' + response.ok);
+                return response.text();
+            })
+            .then(text => {
+                log('Raw response: ' + text);
+                try {
+                    const data = JSON.parse(text);
+                    log('Parsed JSON: ' + JSON.stringify(data));
+                    
+                    if (data.success) {
+                        resultDiv.innerHTML = '<div class="result success">SUCCESS: ' + data.message + '</div>';
+                    } else {
+                        resultDiv.innerHTML = '<div class="result error">ERROR: ' + data.message + '</div>';
+                    }
+                } catch (e) {
+                    log('JSON parse error: ' + e.message);
+                    resultDiv.innerHTML = '<div class="result error">Failed to parse response: ' + text + '</div>';
+                }
+            })
+            .catch(error => {
+                log('Fetch error: ' + error.message);
+                resultDiv.innerHTML = '<div class="result error">Network error: ' + error.message + '</div>';
+            });
+        });
+        
+        // Test basic connectivity
+        log('Testing basic connectivity...');
+        fetch('submit-form.php', { method: 'GET' })
+            .then(response => log('GET test - Status: ' + response.status))
+            .catch(error => log('GET test failed: ' + error.message));
+    </script>
+</body>
+</html>

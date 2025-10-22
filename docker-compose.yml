@@ -1,0 +1,15 @@
+services:
+  mechanic-africa:
+    build: .
+    container_name: mechanic-africa-web
+    ports:
+      - "9000:80"
+    restart: unless-stopped
+    volumes:
+      - ./:/app:rw
+    networks:
+      - mechanic-network
+
+networks:
+  mechanic-network:
+    driver: bridge

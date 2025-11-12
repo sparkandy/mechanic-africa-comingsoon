@@ -7,11 +7,20 @@ requireAuth(ROLE_ADMIN);
 $message = '';
 $error = '';
 
+// Generate CSRF token if not exists
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
-    
-    switch ($action) {
+    // CSRF Protection
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error = 'Invalid security token. Please refresh the page and try again.';
+    } else {
+        $action = $_POST['action'] ?? '';
+        
+        switch ($action) {
         case 'add_user':
             $result = addUser($_POST);
             if ($result['success']) {
@@ -56,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = $result['message'];
             }
             break;
+        }
     }
 }
 
@@ -629,6 +639,7 @@ require 'auth.php'; // Include session management functions
         <div class="user-form">
             <h3>➕ Add New User</h3>
             <form method="POST" action="">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <input type="hidden" name="action" value="add_user">
                 <div class="form-row">
                     <div class="form-group">
@@ -703,6 +714,7 @@ require 'auth.php'; // Include session management functions
                                 <button class="btn btn-secondary btn-sm" onclick="editUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>', '<?php echo htmlspecialchars($user['email']); ?>', '<?php echo $user['role']; ?>')">Edit</button>
                                 <button class="btn btn-secondary btn-sm" onclick="changePassword(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">Reset Password</button>
                                 <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure?')">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                                     <input type="hidden" name="action" value="toggle_user_status">
                                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <button type="submit" class="btn <?php echo $user['is_active'] ? 'btn-danger' : 'btn-success'; ?> btn-sm">
@@ -710,6 +722,7 @@ require 'auth.php'; // Include session management functions
                                     </button>
                                 </form>
                                 <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                                     <input type="hidden" name="action" value="delete_user">
                                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
@@ -737,6 +750,7 @@ require 'auth.php'; // Include session management functions
                 <button class="close" onclick="closeModal('editUserModal')">&times;</button>
             </div>
             <form method="POST" action="">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <input type="hidden" name="action" value="edit_user">
                 <input type="hidden" id="edit_user_id" name="user_id">
                 <div class="form-group">
@@ -773,6 +787,7 @@ require 'auth.php'; // Include session management functions
                 <button class="close" onclick="closeModal('changePasswordModal')">&times;</button>
             </div>
             <form method="POST" action="">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <input type="hidden" name="action" value="change_password">
                 <input type="hidden" id="password_user_id" name="user_id">
                 <p>Changing password for: <strong id="password_username"></strong></p>

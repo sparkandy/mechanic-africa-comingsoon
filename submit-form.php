@@ -35,6 +35,38 @@ if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) ||
     exit;
 }
 
+/**
+ * Get client IP address securely
+ * Prevents IP spoofing by using REMOTE_ADDR (cannot be spoofed)
+ */
+function getClientIP() {
+    // Use REMOTE_ADDR which cannot be spoofed by the client
+    // This is the IP address of the connection to the server
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    
+    // Optional: If you're behind a trusted reverse proxy (like CloudFlare, AWS ELB)
+    // Uncomment and configure the trusted proxy IPs below
+    /*
+    $trustedProxies = [
+        // Add your hosting provider's proxy IPs here
+        // Example: '10.0.0.1', '172.16.0.1'
+    ];
+    
+    // Only trust X-Forwarded-For if request comes from trusted proxy
+    if (in_array($ip, $trustedProxies, true) && isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $forwardedIPs = array_map('trim', explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']));
+        $clientIP = $forwardedIPs[0]; // Get first IP (original client)
+        
+        // Validate IP format (reject private/reserved IPs)
+        if (filter_var($clientIP, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return $clientIP;
+        }
+    }
+    */
+    
+    return $ip;
+}
+
 // Database file path
 $dbFile = DB_FILE;
 
@@ -72,7 +104,7 @@ try {
 }
 
 // Rate limiting check
-$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$ip = getClientIP();
 try {
     $stmt = $pdo->prepare("
         SELECT COUNT(*) as count 
@@ -181,8 +213,8 @@ if (!empty($errors)) {
     exit;
 }
 
-// Get client IP address
-$ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+// Get client IP address (using secure function)
+$ipAddress = getClientIP();
 
 // Insert data into database
 try {

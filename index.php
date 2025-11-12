@@ -1429,7 +1429,11 @@
                         const params = new URLSearchParams(hashParts[1]);
                         const plan = params.get('plan');
                         
-                        if (plan) {
+                        // XSS PROTECTION: Validate plan against whitelist
+                        const allowedPlans = ['4-cylinders', '7-cylinders', '8-cylinders'];
+                        
+                        if (plan && allowedPlans.includes(plan)) {
+                            // Safe to set - plan is validated
                             packageSelect.value = plan;
                             const formSection = document.getElementById('contact-form');
                             if (formSection) {

@@ -48,6 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user = $stmt->fetch();
                 
                 if ($user && password_verify($password, $user['password_hash'])) {
+                    // Prevent session fixation - regenerate session ID
+                    session_regenerate_id(true);
+                    
                     // Successful login
                     $_SESSION['admin_user_id'] = $user['id'];
                     $_SESSION['admin_username'] = $user['username'];

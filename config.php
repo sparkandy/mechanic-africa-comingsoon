@@ -6,6 +6,16 @@
  * Get your keys from: https://www.google.com/recaptcha/admin/create
  */
 
+// Force HTTPS (production only)
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+    if (isset($_SERVER['HTTP_HOST']) && 
+        (strpos($_SERVER['HTTP_HOST'], 'mechanicafrica.com') !== false)) {
+        $redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        header('Location: ' . $redirect, true, 301);
+        exit;
+    }
+}
+
 // reCAPTCHA Configuration
 // Site Key (public key) - used in HTML forms
 define('RECAPTCHA_SITE_KEY', '6LcXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');

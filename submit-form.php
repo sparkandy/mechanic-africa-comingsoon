@@ -2,20 +2,36 @@
 // Include configuration
 require_once 'config.php';
 
-// Enable error reporting for debugging (remove in production)
+// Error reporting for production - log errors, don't display them
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);  // Never show errors to users in production
+ini_set('log_errors', 1);       // Log errors to file
+ini_set('error_log', __DIR__ . '/error.log');
 
 // Set content type
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
+
+// CORS - Restrict to your domain only (remove in production if not needed)
+$allowed_origins = ['https://mechanicafrica.com', 'https://www.mechanicafrica.com'];
+if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    header('Access-Control-Allow-Methods: POST');
+    header('Access-Control-Allow-Headers: Content-Type');
+}
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+    exit;
+}
+
+// CSRF Protection
+session_start();
+if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || 
+    $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Invalid security token']);
     exit;
 }
 
@@ -50,8 +66,34 @@ try {
     
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
+    echo json_encode(['success' => false, 'message' => 'Service temporarily unavailable']);
+    error_log('Database connection failed: ' . $e->getMessage());
     exit;
+}
+
+// Rate limiting check
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+try {
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) as count 
+        FROM contacts 
+        WHERE ip_address = ? 
+        AND submitted_at > datetime('now', '-1 hour')
+    ");
+    $stmt->execute([$ip]);
+    $submissions = $stmt->fetch()['count'];
+    
+    if ($submissions >= MAX_SUBMISSIONS_PER_HOUR) {
+        http_response_code(429);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Too many submissions. Please try again later.'
+        ]);
+        exit;
+    }
+} catch (PDOException $e) {
+    // Continue if rate limit check fails (don't block legitimate users)
+    error_log('Rate limit check failed: ' . $e->getMessage());
 }
 
 // Get form data
@@ -66,14 +108,11 @@ if (strpos($contentType, 'application/json') !== false) {
     $input = $_POST;
 }
 
-// Debug: Log the received data (remove in production)
-error_log('Received data: ' . print_r($input, true));
-error_log('Content-Type: ' . $contentType);
-
-$name = trim($input['name'] ?? '');
-$email = trim($input['email'] ?? '');
-$package = trim($input['package'] ?? '');
-$carInfo = trim($input['car'] ?? '');
+// Sanitize and limit input lengths
+$name = substr(trim($input['name'] ?? ''), 0, 100);
+$email = substr(trim($input['email'] ?? ''), 0, 255);
+$package = substr(trim($input['package'] ?? ''), 0, 50);
+$carInfo = substr(trim($input['car'] ?? ''), 0, 200);
 $captchaResponse = trim($input['g-recaptcha-response'] ?? '');
 
 // reCAPTCHA configuration

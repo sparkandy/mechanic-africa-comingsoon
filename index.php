@@ -1267,13 +1267,24 @@
             <div class="contact-form" id="contact-form">
                 <h3>Request a Service</h3>
                 <form id="contactForm">
+                    <?php
+                    // Generate CSRF token
+                    if (session_status() === PHP_SESSION_NONE) {
+                        session_start();
+                    }
+                    if (!isset($_SESSION['csrf_token'])) {
+                        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                    }
+                    ?>
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                    
                     <div class="form-group">
                         <label>Full Name</label>
-                        <input type="text" id="name" name="name" placeholder="Paul Iroribuilar" required>
+                        <input type="text" id="name" name="name" placeholder="Paul Iroribuilar" maxlength="100" required>
                     </div>
                     <div class="form-group">
                         <label>Email Address</label>
-                        <input type="email" id="email" name="email" placeholder="Pauliroribuilar@gmail.com" required>
+                        <input type="email" id="email" name="email" placeholder="Pauliroribuilar@gmail.com" maxlength="255" required>
                     </div>
                     <div class="form-group">
                         <label>Select Service Package</label>
@@ -1286,11 +1297,11 @@
                     </div>
                     <div class="form-group">
                         <label>Car Information</label>
-                        <input type="text" id="car" name="car" placeholder="2024 Toyota Corolla" required>
+                        <input type="text" id="car" name="car" placeholder="2024 Toyota Corolla" maxlength="200" required>
                     </div>
                     <div class="form-group">
                         <label>Additional Message (Optional)</label>
-                        <textarea id="message" name="message" placeholder="Tell us about the service you need"></textarea>
+                        <textarea id="message" name="message" placeholder="Tell us about the service you need" maxlength="1000"></textarea>
                     </div>
                     <!-- reCAPTCHA -->
                     <div class="form-group captcha-group">

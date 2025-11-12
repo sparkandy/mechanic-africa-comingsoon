@@ -21,16 +21,19 @@ DirectoryIndex index.php index.html
 AddType application/x-httpd-php .php
 
 # Security: Deny access to sensitive files
+# Block SQLite database file
 <Files "contacts.db">
     Order Allow,Deny
     Deny from all
 </Files>
 
+# Block .htaccess file itself
 <Files ".htaccess">
     Order Allow,Deny
     Deny from all
 </Files>
 
+# Block configuration files
 <Files "config.php">
     Order Allow,Deny
     Deny from all
@@ -41,8 +44,42 @@ AddType application/x-httpd-php .php
     Deny from all
 </Files>
 
+# Block admin setup/initialization scripts
+<Files "init-database.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "create-super-admin.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "add-superadmin.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Block test files
+<Files "test-form.html">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Block backup files
+<FilesMatch "\.(bak|backup|old|save|~)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
 # Block access to hidden files
 <FilesMatch "^\.">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Block access to any .db files
+<FilesMatch "\.db$">
     Order Allow,Deny
     Deny from all
 </FilesMatch>
@@ -54,6 +91,13 @@ AddType application/x-httpd-php .php
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    
+    # Content Security Policy - Allows Google reCAPTCHA and Fonts
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://www.google.com; connect-src 'self';"
+    
+    # X-Permitted-Cross-Domain-Policies
+    Header always set X-Permitted-Cross-Domain-Policies "none"
+    
     # HSTS - Enable only after confirming HTTPS works
     # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 </IfModule>

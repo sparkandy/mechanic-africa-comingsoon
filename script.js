@@ -1,5 +1,19 @@
 // Form handling and validation
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if there's a plan parameter in URL and pre-select it
+    const urlParams = new URLSearchParams(window.location.search);
+    const plan = urlParams.get('plan');
+    const packageSelect = document.getElementById('package');
+    
+    if (plan && packageSelect) {
+        packageSelect.value = plan;
+        // Highlight the form to draw attention
+        const formContainer = document.querySelector('.form-container');
+        if (formContainer) {
+            formContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+    
     // Handle form submission
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
@@ -17,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = originalFormData.get('name').trim();
             const email = originalFormData.get('email').trim();
             const car = originalFormData.get('car').trim();
+            const packageSelected = originalFormData.get('package');
             
             // Client-side validation
             let hasErrors = false;
@@ -36,6 +51,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!car) {
                 showFieldError('car', 'Car information is required');
+                hasErrors = true;
+            }
+            
+            if (!packageSelected) {
+                showFieldError('package', 'Please select a service package');
                 hasErrors = true;
             }
             
@@ -59,11 +79,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData();
             formData.append('name', name);
             formData.append('email', email);
+            formData.append('package', packageSelected);
             formData.append('car', car);
             formData.append('g-recaptcha-response', captchaResponse);
             
             // Submit form via AJAX
-            console.log('Submitting form with data:', {name, email, car});
+            console.log('Submitting form with data:', {name, email, packageSelected, car});
             
             fetch('submit-form.php', {
                 method: 'POST',

@@ -33,12 +33,20 @@ try {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             email TEXT NOT NULL,
+            selected_package TEXT,
             car_information TEXT NOT NULL,
             submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             ip_address TEXT
         )
     ";
     $pdo->exec($createTableSQL);
+    
+    // Add selected_package column if it doesn't exist (for existing databases)
+    try {
+        $pdo->exec("ALTER TABLE contacts ADD COLUMN selected_package TEXT");
+    } catch (PDOException $e) {
+        // Column already exists, ignore error
+    }
     
 } catch (PDOException $e) {
     http_response_code(500);
@@ -64,6 +72,7 @@ error_log('Content-Type: ' . $contentType);
 
 $name = trim($input['name'] ?? '');
 $email = trim($input['email'] ?? '');
+$package = trim($input['package'] ?? '');
 $carInfo = trim($input['car'] ?? '');
 $captchaResponse = trim($input['g-recaptcha-response'] ?? '');
 
@@ -75,6 +84,10 @@ $errors = [];
 
 if (empty($name)) {
     $errors[] = 'Name is required';
+}
+
+if (empty($package)) {
+    $errors[] = 'Service package is required';
 }
 
 if (empty($email)) {
@@ -135,11 +148,11 @@ $ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unk
 // Insert data into database
 try {
     $stmt = $pdo->prepare("
-        INSERT INTO contacts (name, email, car_information, ip_address) 
-        VALUES (?, ?, ?, ?)
+        INSERT INTO contacts (name, email, selected_package, car_information, ip_address) 
+        VALUES (?, ?, ?, ?, ?)
     ");
     
-    $stmt->execute([$name, $email, $carInfo, $ipAddress]);
+    $stmt->execute([$name, $email, $package, $carInfo, $ipAddress]);
     
     // Success response
     echo json_encode([

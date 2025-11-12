@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+    
+    <!-- Homepage -->
+    <url>
+        <loc>https://mechanicafrica.com/</loc>
+        <lastmod>2025-11-12</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+        <image:image>
+            <image:loc>https://mechanicafrica.com/images/mechanic-working-on-vehicle.jpg</image:loc>
+            <image:title>Professional Mechanic Working on Vehicle</image:title>
+            <image:caption>Expert car maintenance services in Nigeria</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://mechanicafrica.com/images/modern-automotive-workshop.jpg</image:loc>
+            <image:title>Modern Automotive Workshop</image:title>
+            <image:caption>State-of-the-art car service facility</image:caption>
+        </image:image>
+    </url>
+    
+    <!-- Services Section -->
+    <url>
+        <loc>https://mechanicafrica.com/#services</loc>
+        <lastmod>2025-11-12</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- Pricing Section -->
+    <url>
+        <loc>https://mechanicafrica.com/#pricing</loc>
+        <lastmod>2025-11-12</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- Partners Section -->
+    <url>
+        <loc>https://mechanicafrica.com/#faq</loc>
+        <lastmod>2025-11-12</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <!-- Contact Section -->
+    <url>
+        <loc>https://mechanicafrica.com/#contact</loc>
+        <lastmod>2025-11-12</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+</urlset>

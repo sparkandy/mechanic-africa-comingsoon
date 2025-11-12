@@ -295,6 +295,7 @@ $currentUser = getCurrentUser();
                 echo "<tr>";
                 echo "<th>Name</th>";
                 echo "<th>Email</th>";
+                echo "<th>Service Package</th>";
                 echo "<th>Car Information</th>";
                 echo "<th>Submitted</th>";
                 echo "<th>IP Address</th>";
@@ -304,9 +305,22 @@ $currentUser = getCurrentUser();
                 
                 foreach ($contacts as $contact) {
                     $submittedDate = date('M j, Y g:i A', strtotime($contact['submitted_at']));
+                    
+                    // Format package display
+                    $packageDisplay = 'Not Selected';
+                    if (!empty($contact['selected_package'])) {
+                        $packageMap = [
+                            '4-cylinders' => '4 Cylinders (60k)',
+                            '7-cylinders' => '7 Cylinders (70k)',
+                            '8-cylinders' => '8 Cylinders (90k)'
+                        ];
+                        $packageDisplay = $packageMap[$contact['selected_package']] ?? htmlspecialchars($contact['selected_package']);
+                    }
+                    
                     echo "<tr>";
                     echo "<td><strong>" . htmlspecialchars($contact['name']) . "</strong></td>";
                     echo "<td class='email'>" . htmlspecialchars($contact['email']) . "</td>";
+                    echo "<td><span style='background: #e74c3c; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; white-space: nowrap;'>" . $packageDisplay . "</span></td>";
                     echo "<td>" . htmlspecialchars($contact['car_information']) . "</td>";
                     echo "<td class='date'>" . $submittedDate . "</td>";
                     echo "<td>" . htmlspecialchars($contact['ip_address']) . "</td>";

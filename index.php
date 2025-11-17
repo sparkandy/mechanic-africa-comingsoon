@@ -1291,7 +1291,7 @@
                         <select id="package" name="package" required>
                             <option value="">Choose your plan</option>
                             <option value="4-cylinders">4 Cylinders - 60k</option>
-                            <option value="7-cylinders">7 Cylinders - 70k</option>
+                            <option value="7-cylinders">6 Cylinders - 70k</option>
                             <option value="8-cylinders">8 Cylinders - 90k</option>
                         </select>
                     </div>

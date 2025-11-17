@@ -242,6 +242,7 @@ $currentUser = getCurrentUser();
             
             <div class="nav-links">
                 <?php if (hasRole(ROLE_ADMIN)): ?>
+                    <a href="partner-management.php">🤝 Partners</a>
                     <a href="user-management.php" class="primary">👥 User Management</a>
                 <?php endif; ?>
                 <a href="auth.php?action=logout" class="danger">🔓 Logout</a>

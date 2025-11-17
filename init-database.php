@@ -44,6 +44,32 @@ try {
     
     $pdo->exec($createSessionsTable);
     
+    // Create partners table
+    $createPartnersTable = "
+        CREATE TABLE IF NOT EXISTS partners (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            company_name VARCHAR(200) NOT NULL,
+            registration_number VARCHAR(100) NOT NULL,
+            phone_number VARCHAR(50) NOT NULL,
+            email VARCHAR(100) NOT NULL,
+            technicians_count INTEGER,
+            years_in_operation INTEGER,
+            workshop_address TEXT NOT NULL,
+            state_city VARCHAR(100) NOT NULL,
+            services_offered TEXT NOT NULL,
+            mobile_mechanic_service VARCHAR(10),
+            ip_address VARCHAR(45),
+            status VARCHAR(20) DEFAULT 'pending',
+            notes TEXT,
+            submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            reviewed_at DATETIME,
+            reviewed_by INTEGER,
+            FOREIGN KEY (reviewed_by) REFERENCES admin_users(id)
+        )
+    ";
+    
+    $pdo->exec($createPartnersTable);
+    
     // Check if any admin users exist
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM admin_users");
     $adminCount = $stmt->fetch()['count'];
@@ -66,6 +92,7 @@ try {
         echo "✅ Database initialized successfully!<br>";
         echo "📊 Admin users table created<br>";
         echo "🔐 Sessions table created<br>";
+        echo "🤝 Partners table created<br>";
         echo "👤 Default admin user created:<br>";
         echo "&nbsp;&nbsp;&nbsp;&nbsp;Username: <strong>$defaultUsername</strong><br>";
         echo "&nbsp;&nbsp;&nbsp;&nbsp;Password: <strong>$defaultPassword</strong><br>";

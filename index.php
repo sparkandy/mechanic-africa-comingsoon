@@ -1337,7 +1337,7 @@
                 <div class="technician-content">
                     <h2>Empowering Technicians, One Repair At A Time.</h2>
                     <p>Are you a skilled technician? Partner with us to access verified jobs, build credibility, and reach more customers. Grow your career with steady work and trusted support across Nigeria.</p>
-                    <a href="javascript:void(0)" onclick="openPartnerModal()" class="join-btn">Join Now</a>
+                    <a href="javascript:void(0)" onclick="openTechnicianModal()" class="join-btn">Join Now</a>
                 </div>
             </div>
         </div>
@@ -1599,6 +1599,67 @@
                 </div>
 
                 <div id="partnerFormMessage"></div>
+                
+                <button type="submit" class="partner-submit-btn">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Technician Registration Modal -->
+    <div id="technicianModal" class="partner-modal" style="display: none;">
+        <div class="partner-modal-overlay" onclick="closeTechnicianModal()"></div>
+        <div class="partner-modal-content technician-modal-content">
+            <button class="partner-modal-close" onclick="closeTechnicianModal()">&times;</button>
+            <h2 class="partner-modal-title">Apply for the Position of a Technicians</h2>
+            
+            <form id="technicianForm" class="partner-form">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                
+                <div class="partner-form-row">
+                    <div class="partner-form-group">
+                        <label for="tech_full_name">Full Name</label>
+                        <input type="text" id="tech_full_name" name="full_name" placeholder="Enter Information" maxlength="200" required>
+                    </div>
+                    <div class="partner-form-group">
+                        <label for="tech_phone_number">Phone Number</label>
+                        <input type="tel" id="tech_phone_number" name="phone_number" placeholder="Enter Information" maxlength="50" required>
+                    </div>
+                </div>
+
+                <div class="partner-form-row">
+                    <div class="partner-form-group">
+                        <label for="tech_email">Email Address</label>
+                        <input type="email" id="tech_email" name="email" placeholder="Enter Information" maxlength="100" required>
+                    </div>
+                    <div class="partner-form-group">
+                        <label for="tech_state_city">State / City</label>
+                        <input type="text" id="tech_state_city" name="state_city" placeholder="Enter Information" maxlength="100" required>
+                    </div>
+                </div>
+
+                <div class="partner-form-row">
+                    <div class="partner-form-group">
+                        <label for="tech_specialization">Area of Specialization</label>
+                        <input type="text" id="tech_specialization" name="area_of_specialization" placeholder="Enter Information" maxlength="200" required>
+                    </div>
+                    <div class="partner-form-group">
+                        <label for="tech_years">Years in Operation</label>
+                        <input type="number" id="tech_years" name="years_in_operation" placeholder="Enter Information" min="0" required>
+                    </div>
+                </div>
+
+                <div class="partner-form-row">
+                    <div class="partner-form-group">
+                        <label for="tech_work_type">Do you work independently or in a workshop?</label>
+                        <input type="text" id="tech_work_type" name="work_type" placeholder="Enter Information" maxlength="100" required>
+                    </div>
+                    <div class="partner-form-group">
+                        <label for="tech_certification">Certification / Training Background</label>
+                        <input type="text" id="tech_certification" name="certification_training" placeholder="Enter Information" maxlength="500" required>
+                    </div>
+                </div>
+
+                <div id="technicianFormMessage"></div>
                 
                 <button type="submit" class="partner-submit-btn">Submit Application</button>
             </form>
@@ -1873,6 +1934,101 @@
 
         function closePartnerModalAndReset() {
             document.getElementById('partnerModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Reset modal content to show form again
+            setTimeout(() => {
+                location.reload();
+            }, 300);
+        }
+
+        // Technician Modal Functions
+        function openTechnicianModal() {
+            document.getElementById('technicianModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeTechnicianModal() {
+            document.getElementById('technicianModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('technicianForm').reset();
+            const formMessage = document.getElementById('technicianFormMessage');
+            formMessage.className = '';
+            formMessage.style.display = 'none';
+        }
+
+        // Handle technician form submission
+        document.getElementById('technicianForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formMessage = document.getElementById('technicianFormMessage');
+            formMessage.className = '';
+            formMessage.style.display = 'none';
+            
+            const submitBtn = this.querySelector('.partner-submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+            
+            const formData = new FormData(this);
+            
+            fetch('submit-technician.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success page
+                    showTechnicianSuccessPage();
+                    this.reset();
+                } else {
+                    formMessage.textContent = data.message || 'An error occurred. Please try again.';
+                    formMessage.className = 'error';
+                    formMessage.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                formMessage.textContent = 'An error occurred. Please try again.';
+                formMessage.className = 'error';
+                formMessage.style.display = 'block';
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+
+        function showTechnicianSuccessPage() {
+            const modalContent = document.querySelector('.technician-modal-content');
+            modalContent.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="margin: 0 auto 32px; width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); display: flex; align-items: center; justify-content: center;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: #EF4444; display: flex; align-items: center; justify-content: center;">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <h2 style="color: #EF4444; font-size: 28px; font-weight: 700; margin-bottom: 20px;">
+                        Application Submitted Successfully
+                    </h2>
+                    
+                    <p style="color: #4B5563; font-size: 16px; line-height: 1.6; max-width: 500px; margin: 0 auto 32px;">
+                        "Thank you for applying to become a Mechanic Africa Technician. Our verification team will review your application and contact you within 5 working days."
+                    </p>
+                    
+                    <button onclick="closeTechnicianModalAndReset()" style="background: #EF4444; color: white; padding: 14px 60px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#DC2626'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)'" onmouseout="this.style.background='#EF4444'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        Go Back
+                    </button>
+                </div>
+            `;
+        }
+
+        function closeTechnicianModalAndReset() {
+            document.getElementById('technicianModal').style.display = 'none';
             document.body.style.overflow = 'auto';
             
             // Reset modal content to show form again

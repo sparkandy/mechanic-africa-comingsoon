@@ -624,6 +624,7 @@ require 'auth.php'; // Include session management functions
             <div class="nav-links">
                 <a href="admin.php" class="primary">📊 Dashboard</a>
                 <a href="partner-management.php">🤝 Partners</a>
+                <a href="technician-management.php">👨‍🔧 Technicians</a>
                 <a href="auth.php?action=logout">🔓 Logout</a>
             </div>
         </div>

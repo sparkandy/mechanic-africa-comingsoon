@@ -1,7 +1,7 @@
 <?php
 /**
- * Partner Management Admin Panel
- * View and manage partner applications
+ * Technician Management Admin Panel
+ * View and manage technician applications
  */
 
 require_once 'auth-config.php';
@@ -38,40 +38,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $canManage) {
         $action = $_POST['action'] ?? '';
         
         if ($action === 'update_status') {
-            $partnerId = filter_var($_POST['partner_id'], FILTER_VALIDATE_INT);
+            $technicianId = filter_var($_POST['technician_id'], FILTER_VALIDATE_INT);
             $status = $_POST['status'] ?? '';
             $notes = trim($_POST['notes'] ?? '');
             
             $allowedStatuses = ['pending', 'approved', 'rejected', 'contacted'];
             
-            if ($partnerId && in_array($status, $allowedStatuses)) {
+            if ($technicianId && in_array($status, $allowedStatuses)) {
                 try {
                     $stmt = $pdo->prepare("
-                        UPDATE partners 
+                        UPDATE technicians 
                         SET status = ?, 
                             notes = ?, 
                             reviewed_at = CURRENT_TIMESTAMP,
                             reviewed_by = ?
                         WHERE id = ?
                     ");
-                    $stmt->execute([$status, $notes, $userInfo['id'], $partnerId]);
-                    $message = 'Partner status updated successfully';
+                    $stmt->execute([$status, $notes, $userInfo['id'], $technicianId]);
+                    $message = 'Technician status updated successfully';
                 } catch (PDOException $e) {
                     $error = 'Failed to update status';
                 }
             }
         }
         
-        if ($action === 'delete_partner') {
-            $partnerId = filter_var($_POST['partner_id'], FILTER_VALIDATE_INT);
+        if ($action === 'delete_technician') {
+            $technicianId = filter_var($_POST['technician_id'], FILTER_VALIDATE_INT);
             
-            if ($partnerId) {
+            if ($technicianId) {
                 try {
-                    $stmt = $pdo->prepare("DELETE FROM partners WHERE id = ?");
-                    $stmt->execute([$partnerId]);
-                    $message = 'Partner application deleted successfully';
+                    $stmt = $pdo->prepare("DELETE FROM technicians WHERE id = ?");
+                    $stmt->execute([$technicianId]);
+                    $message = 'Technician application deleted successfully';
                 } catch (PDOException $e) {
-                    $error = 'Failed to delete partner application';
+                    $error = 'Failed to delete technician application';
                 }
             }
         }
@@ -87,32 +87,32 @@ if (!isset($_SESSION['csrf_token'])) {
 $filterStatus = $_GET['status'] ?? 'all';
 $searchQuery = $_GET['search'] ?? '';
 
-// Fetch partners
+// Fetch technicians
 try {
-    $sql = "SELECT p.*, u.username as reviewed_by_name 
-            FROM partners p 
-            LEFT JOIN admin_users u ON p.reviewed_by = u.id 
+    $sql = "SELECT t.*, u.username as reviewed_by_name 
+            FROM technicians t 
+            LEFT JOIN admin_users u ON t.reviewed_by = u.id 
             WHERE 1=1";
     $params = [];
     
     if ($filterStatus !== 'all') {
-        $sql .= " AND p.status = ?";
+        $sql .= " AND t.status = ?";
         $params[] = $filterStatus;
     }
     
     if (!empty($searchQuery)) {
-        $sql .= " AND (p.company_name LIKE ? OR p.email LIKE ? OR p.phone_number LIKE ?)";
+        $sql .= " AND (t.full_name LIKE ? OR t.email LIKE ? OR t.phone_number LIKE ?)";
         $searchTerm = "%$searchQuery%";
         $params[] = $searchTerm;
         $params[] = $searchTerm;
         $params[] = $searchTerm;
     }
     
-    $sql .= " ORDER BY p.submitted_at DESC";
+    $sql .= " ORDER BY t.submitted_at DESC";
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-    $partners = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $technicians = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Get statistics
     $stats = [
@@ -130,13 +130,13 @@ try {
             SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
             SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
             SUM(CASE WHEN status = 'contacted' THEN 1 ELSE 0 END) as contacted
-        FROM partners
+        FROM technicians
     ");
     $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
     
 } catch (PDOException $e) {
-    $partners = [];
-    $error = 'Failed to fetch partner applications';
+    $technicians = [];
+    $error = 'Failed to fetch technician applications';
 }
 ?>
 <!DOCTYPE html>
@@ -144,7 +144,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partner Applications - Mechanic Africa Admin</title>
+    <title>Technician Applications - Mechanic Africa Admin</title>
     <style>
         * {
             margin: 0;
@@ -440,10 +440,10 @@ try {
 </head>
 <body>
     <div class="header">
-        <h1>🤝 Partner Applications</h1>
+        <h1>👨‍🔧 Technician Applications</h1>
         <div class="nav-links">
             <a href="admin.php">📊 Dashboard</a>
-            <a href="technician-management.php">👨‍🔧 Technicians</a>
+            <a href="partner-management.php">🤝 Partners</a>
             <a href="user-management.php">👥 Users</a>
             <a href="logout.php">🚪 Logout</a>
         </div>
@@ -501,45 +501,45 @@ try {
             </div>
         </div>
 
-        <!-- Partners Table -->
+        <!-- Technicians Table -->
         <div class="partners-table">
-            <?php if (count($partners) > 0): ?>
+            <?php if (count($technicians) > 0): ?>
                 <table>
                     <thead>
                         <tr>
-                            <th>Company Name</th>
+                            <th>Full Name</th>
                             <th>Contact</th>
                             <th>Location</th>
-                            <th>Technicians</th>
+                            <th>Specialization</th>
                             <th>Status</th>
                             <th>Submitted</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($partners as $partner): ?>
+                        <?php foreach ($technicians as $technician): ?>
                             <tr>
                                 <td>
-                                    <strong><?php echo htmlspecialchars($partner['company_name']); ?></strong><br>
-                                    <small>Reg: <?php echo htmlspecialchars($partner['registration_number']); ?></small>
+                                    <strong><?php echo htmlspecialchars($technician['full_name']); ?></strong><br>
+                                    <small><?php echo htmlspecialchars($technician['years_in_operation']); ?> years exp.</small>
                                 </td>
                                 <td>
-                                    <?php echo htmlspecialchars($partner['email']); ?><br>
-                                    <small><?php echo htmlspecialchars($partner['phone_number']); ?></small>
+                                    <?php echo htmlspecialchars($technician['email']); ?><br>
+                                    <small><?php echo htmlspecialchars($technician['phone_number']); ?></small>
                                 </td>
-                                <td><?php echo htmlspecialchars($partner['state_city']); ?></td>
-                                <td><?php echo htmlspecialchars($partner['technicians_count']); ?></td>
+                                <td><?php echo htmlspecialchars($technician['state_city']); ?></td>
+                                <td><?php echo htmlspecialchars($technician['area_of_specialization']); ?></td>
                                 <td>
-                                    <span class="status-badge status-<?php echo htmlspecialchars($partner['status']); ?>">
-                                        <?php echo ucfirst(htmlspecialchars($partner['status'])); ?>
+                                    <span class="status-badge status-<?php echo htmlspecialchars($technician['status']); ?>">
+                                        <?php echo ucfirst(htmlspecialchars($technician['status'])); ?>
                                     </span>
                                 </td>
-                                <td><?php echo date('M j, Y', strtotime($partner['submitted_at'])); ?></td>
+                                <td><?php echo date('M j, Y', strtotime($technician['submitted_at'])); ?></td>
                                 <td>
                                     <div class="actions">
-                                        <button onclick="viewPartner(<?php echo $partner['id']; ?>)" class="btn btn-primary btn-small">View</button>
+                                        <button onclick="viewTechnician(<?php echo $technician['id']; ?>)" class="btn btn-primary btn-small">View</button>
                                         <?php if ($canManage): ?>
-                                            <button onclick="updateStatus(<?php echo $partner['id']; ?>)" class="btn btn-secondary btn-small">Update</button>
+                                            <button onclick="updateStatus(<?php echo $technician['id']; ?>)" class="btn btn-secondary btn-small">Update</button>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -549,20 +549,20 @@ try {
                 </table>
             <?php else: ?>
                 <div class="no-data">
-                    <p>No partner applications found.</p>
+                    <p>No technician applications found.</p>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 
-    <!-- View Partner Modal -->
+    <!-- View Technician Modal -->
     <div id="viewModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Partner Application Details</h3>
+                <h3>Technician Application Details</h3>
                 <button class="close" onclick="closeModal('viewModal')">&times;</button>
             </div>
-            <div id="partnerDetails"></div>
+            <div id="technicianDetails"></div>
         </div>
     </div>
 
@@ -570,13 +570,13 @@ try {
     <div id="statusModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Update Partner Status</h3>
+                <h3>Update Technician Status</h3>
                 <button class="close" onclick="closeModal('statusModal')">&times;</button>
             </div>
             <form method="POST">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <input type="hidden" name="action" value="update_status">
-                <input type="hidden" id="status_partner_id" name="partner_id">
+                <input type="hidden" id="status_technician_id" name="technician_id">
                 
                 <div class="form-group">
                     <label for="status">Status</label>
@@ -590,7 +590,7 @@ try {
                 
                 <div class="form-group">
                     <label for="notes">Notes</label>
-                    <textarea id="notes" name="notes" class="form-control" placeholder="Add any notes about this partner..."></textarea>
+                    <textarea id="notes" name="notes" class="form-control" placeholder="Add any notes about this technician..."></textarea>
                 </div>
                 
                 <div style="display: flex; gap: 1rem;">
@@ -602,86 +602,78 @@ try {
     </div>
 
     <script>
-        const partners = <?php echo json_encode($partners); ?>;
+        const technicians = <?php echo json_encode($technicians); ?>;
 
-        function viewPartner(id) {
-            const partner = partners.find(p => p.id === id);
-            if (!partner) return;
+        function viewTechnician(id) {
+            const technician = technicians.find(t => t.id === id);
+            if (!technician) return;
 
             const html = `
                 <div class="detail-row">
-                    <div class="detail-label">Company Name:</div>
-                    <div class="detail-value">${escapeHtml(partner.company_name)}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Registration No:</div>
-                    <div class="detail-value">${escapeHtml(partner.registration_number)}</div>
+                    <div class="detail-label">Full Name:</div>
+                    <div class="detail-value">${escapeHtml(technician.full_name)}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Email:</div>
-                    <div class="detail-value"><a href="mailto:${escapeHtml(partner.email)}">${escapeHtml(partner.email)}</a></div>
+                    <div class="detail-value"><a href="mailto:${escapeHtml(technician.email)}">${escapeHtml(technician.email)}</a></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Phone:</div>
-                    <div class="detail-value"><a href="tel:${escapeHtml(partner.phone_number)}">${escapeHtml(partner.phone_number)}</a></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Workshop Address:</div>
-                    <div class="detail-value">${escapeHtml(partner.workshop_address)}</div>
+                    <div class="detail-value"><a href="tel:${escapeHtml(technician.phone_number)}">${escapeHtml(technician.phone_number)}</a></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">State/City:</div>
-                    <div class="detail-value">${escapeHtml(partner.state_city)}</div>
+                    <div class="detail-value">${escapeHtml(technician.state_city)}</div>
                 </div>
                 <div class="detail-row">
-                    <div class="detail-label">Technicians:</div>
-                    <div class="detail-value">${escapeHtml(partner.technicians_count)}</div>
+                    <div class="detail-label">Specialization:</div>
+                    <div class="detail-value">${escapeHtml(technician.area_of_specialization)}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Years in Operation:</div>
-                    <div class="detail-value">${escapeHtml(partner.years_in_operation)}</div>
+                    <div class="detail-value">${escapeHtml(technician.years_in_operation)}</div>
                 </div>
                 <div class="detail-row">
-                    <div class="detail-label">Services Offered:</div>
-                    <div class="detail-value">${escapeHtml(partner.services_offered)}</div>
+                    <div class="detail-label">Work Type:</div>
+                    <div class="detail-value">${escapeHtml(technician.work_type)}</div>
                 </div>
                 <div class="detail-row">
-                    <div class="detail-label">Mobile Service:</div>
-                    <div class="detail-value">${escapeHtml(partner.mobile_mechanic_service)}</div>
+                    <div class="detail-label">Certification:</div>
+                    <div class="detail-value">${escapeHtml(technician.certification_training)}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Status:</div>
-                    <div class="detail-value"><span class="status-badge status-${escapeHtml(partner.status)}">${escapeHtml(partner.status)}</span></div>
+                    <div class="detail-value"><span class="status-badge status-${escapeHtml(technician.status)}">${escapeHtml(technician.status)}</span></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Submitted:</div>
-                    <div class="detail-value">${new Date(partner.submitted_at).toLocaleString()}</div>
+                    <div class="detail-value">${new Date(technician.submitted_at).toLocaleString()}</div>
                 </div>
-                ${partner.notes ? `
+                ${technician.notes ? `
                 <div class="detail-row">
                     <div class="detail-label">Notes:</div>
-                    <div class="detail-value">${escapeHtml(partner.notes)}</div>
+                    <div class="detail-value">${escapeHtml(technician.notes)}</div>
                 </div>
                 ` : ''}
-                ${partner.reviewed_by_name ? `
+                ${technician.reviewed_by_name ? `
                 <div class="detail-row">
                     <div class="detail-label">Reviewed By:</div>
-                    <div class="detail-value">${escapeHtml(partner.reviewed_by_name)}</div>
+                    <div class="detail-value">${escapeHtml(technician.reviewed_by_name)}</div>
                 </div>
                 ` : ''}
             `;
 
-            document.getElementById('partnerDetails').innerHTML = html;
+            document.getElementById('technicianDetails').innerHTML = html;
             document.getElementById('viewModal').style.display = 'block';
         }
 
         function updateStatus(id) {
-            const partner = partners.find(p => p.id === id);
-            if (!partner) return;
+            const technician = technicians.find(t => t.id === id);
+            if (!technician) return;
 
-            document.getElementById('status_partner_id').value = id;
-            document.getElementById('status').value = partner.status;
-            document.getElementById('notes').value = partner.notes || '';
+            document.getElementById('status_technician_id').value = id;
+            document.getElementById('status').value = technician.status;
+            document.getElementById('notes').value = technician.notes || '';
             document.getElementById('statusModal').style.display = 'block';
         }
 

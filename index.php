@@ -1111,7 +1111,7 @@
         <div class="container">
             <div class="section-header">
                 <h2>Why Choose Mechanic Africa</h2>
-                <p>We're redefining car maintenance across Nigeria — combining certified expertise, genuine parts, and digital convenience to keep your car performing at its best.</p>
+                <p>We are redefining car maintenance across Africa starting with Nigeria  — combining certified expertise, genuine parts, and digital convenience to keep your car performing at its best.</p>
             </div>
             <div class="features-grid">
                 <div class="feature-card">
@@ -1139,7 +1139,7 @@
                     <img src="images/nation-wide-access.jpg" alt="Nationwide access - Car maintenance services available across all major Nigerian cities">
                     <div class="feature-content">
                         <h3>Nationwide Access</h3>
-                        <p>No hidden charges or surprise costs — just honest, upfront pricing for every plan and service.</p>
+                        <p>With Mechanic Africa, you’re never far from quality service. Choose between convenient home service or professional care at our verified partner centers across Nigeria.</p>
                     </div>
                 </div>
             </div>
@@ -1238,21 +1238,21 @@
                         <div class="contact-icon">📞</div>
                         <div class="contact-text">
                             <h4>Phone Number</h4>
-                            <p>+234 800 MECHANIC (632-4264)</p>
+                            <p>+234 915 973 7815</p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <div class="contact-icon">✉️</div>
                         <div class="contact-text">
                             <h4>Email</h4>
-                            <p>hello@mechanicafrica.com</p>
+                            <p>info@mechanicafrica.com</p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <div class="contact-icon">📍</div>
                         <div class="contact-text">
                             <h4>Location</h4>
-                            <p>Serving all major cities across Nigeria</p>
+                            <p>enters across Africa coming soon</p>
                         </div>
                     </div>
                     <div class="contact-item">

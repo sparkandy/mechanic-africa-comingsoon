@@ -1216,13 +1216,13 @@
                 <div class="testimonial-quote">
                     "Professional, timely, and transparent service. My car feels brand new again!" — Chinedu A., Hyundai Sonata Owner
                 </div>
-                <div class="testimonial-author">
+                <!-- <div class="testimonial-author">
                     <div class="author-avatar"></div>
                     <div class="author-info">
                         <h4>Iroribuilar Paul</h4>
                         <p>Product Designer</p>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </section>

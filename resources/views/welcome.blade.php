@@ -1,5 +1,14 @@
 @extends('layouts.app')
 
+@section('seo')
+<x-seo 
+    title="Mechanic Africa - Professional Car Maintenance & Oil Change Services in Nigeria"
+    description="Expert car maintenance, oil change, and vehicle servicing across Nigeria. Certified mechanics, genuine parts, transparent pricing. Book your 4, 6, or 8-cylinder engine service today from ₦60,000."
+    keywords="car maintenance Nigeria, oil change Lagos, vehicle servicing Abuja, auto mechanic Nigeria, car repair services, engine oil change, certified mechanics, genuine auto parts, car service package, mobile mechanic, auto workshop Nigeria, vehicle inspection, car diagnostics"
+    :schema="view('components.schema.organization-service')->render()"
+/>
+@endsection
+
 @section('content')
 <body>
     <!-- Navigation -->

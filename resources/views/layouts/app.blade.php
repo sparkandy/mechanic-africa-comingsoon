@@ -5,40 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
-    <!-- Primary Meta Tags -->
-    <title>@yield('title', 'Mechanic Africa - Professional Car Maintenance & Oil Change Services in Nigeria')</title>
-    <meta name="title" content="@yield('meta_title', 'Mechanic Africa - Professional Car Maintenance & Oil Change Services in Nigeria')">
-    <meta name="description" content="@yield('meta_description', 'Expert car maintenance, oil change, and vehicle servicing across Nigeria. Certified mechanics, genuine parts, transparent pricing. Book your 4, 7, or 8-cylinder engine service today from ₦60,000.')">
-    <meta name="keywords" content="car maintenance Nigeria, oil change Lagos, vehicle servicing Abuja, auto mechanic Nigeria, car repair services, engine oil change, certified mechanics, genuine auto parts, car service package">
-    <meta name="author" content="Mechanic Africa">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="{{ url()->current() }}">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('og_title', 'Mechanic Africa - Professional Car Maintenance & Oil Change Services in Nigeria')">
-    <meta property="og:description" content="@yield('og_description', 'Expert car maintenance, oil change, and vehicle servicing across Nigeria.')">
-    <meta property="og:image" content="{{ asset('images/mechanic-working-on-vehicle.jpg') }}">
-    <meta property="og:locale" content="en_NG">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="{{ url()->current() }}">
-    <meta name="twitter:title" content="@yield('twitter_title', 'Mechanic Africa')">
+    {{-- SEO Meta Tags --}}
+    @hasSection('seo')
+        @yield('seo')
+    @else
+        <x-seo />
+    @endif
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#EF4444">
+    <meta name="msapplication-TileColor" content="#EF4444">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/apple-touch-icon.png') }}">
     
-    <!-- Fonts -->
+    <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- DNS Prefetch -->
+    <link rel="dns-prefetch" href="https://www.google-analytics.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     
     <style>
         /* CSS Version: 2025-11-17-FINAL-{{ time() }} */

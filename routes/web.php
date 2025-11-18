@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\TechnicianController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ContactManagementController;
@@ -20,6 +21,9 @@ use App\Http\Controllers\Admin\ReportController;
 
 // Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Sitemap
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Contact Form Submission
 Route::post('/submit-contact', [ContactController::class, 'submit'])->name('contact.submit');

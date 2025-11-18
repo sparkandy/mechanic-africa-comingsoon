@@ -12,62 +12,87 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $stats = [
-            'total_contacts' => Contact::count(),
-            'unread_contacts' => Contact::where('status', 'unread')->count(),
-            'total_partners' => Partner::count(),
-            'pending_partners' => Partner::where('status', 'pending')->count(),
-            'total_technicians' => Technician::count(),
-            'pending_technicians' => Technician::where('status', 'pending')->count(),
-            'this_week' => Contact::where('created_at', '>=', Carbon::now()->startOfWeek())->count() +
-                          Partner::where('created_at', '>=', Carbon::now()->startOfWeek())->count() +
-                          Technician::where('created_at', '>=', Carbon::now()->startOfWeek())->count(),
-        ];
-
-        // Get recent activities
-        $recent_activities = collect();
-
-        // Add recent contacts
-        Contact::latest()->take(5)->get()->each(function($contact) use ($recent_activities) {
-            $recent_activities->push([
-                'type' => 'contact',
-                'name' => $contact->name,
-                'email' => $contact->email,
-                'status' => $contact->status,
-                'date' => $contact->created_at->diffForHumans(),
-                'view_url' => route('admin.contacts.show', $contact->id),
-            ]);
+        // Service Requests Statistics
+        $totalContacts = Contact::count();
+        $unreadContacts = Contact::where('status', 'unread')->count();
+        $todayContacts = Contact::whereDate('created_at', today())->count();
+        $weekContacts = Contact::where('created_at', '>=', Carbon::now()->startOfWeek())->count();
+        $monthContacts = Contact::where('created_at', '>=', Carbon::now()->startOfMonth())->count();
+        
+        // Partners Statistics
+        $totalPartners = Partner::count();
+        $pendingPartners = Partner::where('status', 'pending')->count();
+        $approvedPartners = Partner::where('status', 'approved')->count();
+        $rejectedPartners = Partner::where('status', 'rejected')->count();
+        $todayPartners = Partner::whereDate('created_at', today())->count();
+        $weekPartners = Partner::where('created_at', '>=', Carbon::now()->startOfWeek())->count();
+        
+        // Technicians Statistics
+        $totalTechnicians = Technician::count();
+        $pendingTechnicians = Technician::where('status', 'pending')->count();
+        $approvedTechnicians = Technician::where('status', 'approved')->count();
+        $rejectedTechnicians = Technician::where('status', 'rejected')->count();
+        $todayTechnicians = Technician::whereDate('created_at', today())->count();
+        $weekTechnicians = Technician::where('created_at', '>=', Carbon::now()->startOfWeek())->count();
+        
+        // Growth rates
+        $lastWeekContacts = Contact::whereBetween('created_at', [
+            Carbon::now()->subWeek()->startOfWeek(),
+            Carbon::now()->subWeek()->endOfWeek()
+        ])->count();
+        $contactsGrowth = $lastWeekContacts > 0 ? round((($weekContacts - $lastWeekContacts) / $lastWeekContacts) * 100, 1) : 0;
+        
+        $lastWeekPartners = Partner::whereBetween('created_at', [
+            Carbon::now()->subWeek()->startOfWeek(),
+            Carbon::now()->subWeek()->endOfWeek()
+        ])->count();
+        $partnersGrowth = $lastWeekPartners > 0 ? round((($weekPartners - $lastWeekPartners) / $lastWeekPartners) * 100, 1) : 0;
+        
+        $lastWeekTechnicians = Technician::whereBetween('created_at', [
+            Carbon::now()->subWeek()->startOfWeek(),
+            Carbon::now()->subWeek()->endOfWeek()
+        ])->count();
+        $techniciansGrowth = $lastWeekTechnicians > 0 ? round((($weekTechnicians - $lastWeekTechnicians) / $lastWeekTechnicians) * 100, 1) : 0;
+        
+        // Recent activities
+        $recentContacts = Contact::latest()->take(10)->get()->map(function($item) {
+            return [
+                'type' => 'Service Request',
+                'description' => $item->name . ' submitted a service request',
+                'created_at' => $item->created_at,
+                'status' => $item->status
+            ];
         });
-
-        // Add recent partners
-        Partner::latest()->take(5)->get()->each(function($partner) use ($recent_activities) {
-            $recent_activities->push([
-                'type' => 'partner',
-                'name' => $partner->company_name,
-                'email' => $partner->email,
-                'status' => $partner->status,
-                'date' => $partner->created_at->diffForHumans(),
-                'view_url' => route('admin.partners.show', $partner->id),
-            ]);
+        
+        $recentPartners = Partner::latest()->take(10)->get()->map(function($item) {
+            return [
+                'type' => 'Partner Application',
+                'description' => $item->workshop_name . ' applied for partnership',
+                'created_at' => $item->created_at,
+                'status' => $item->status
+            ];
         });
-
-        // Add recent technicians
-        Technician::latest()->take(5)->get()->each(function($technician) use ($recent_activities) {
-            $recent_activities->push([
-                'type' => 'technician',
-                'name' => $technician->full_name,
-                'email' => $technician->email,
-                'status' => $technician->status,
-                'date' => $technician->created_at->diffForHumans(),
-                'view_url' => route('admin.technicians.show', $technician->id),
-            ]);
+        
+        $recentTechnicians = Technician::latest()->take(10)->get()->map(function($item) {
+            return [
+                'type' => 'Technician Application',
+                'description' => $item->name . ' applied as technician',
+                'created_at' => $item->created_at,
+                'status' => $item->status
+            ];
         });
+        
+        $recentActivities = $recentContacts
+            ->merge($recentPartners)
+            ->merge($recentTechnicians)
+            ->sortByDesc('created_at')
+            ->take(10);
 
-        // Sort by date and take top 10
-        $recent_activities = $recent_activities->sortByDesc(function($activity) {
-            return strtotime($activity['date']);
-        })->take(10);
-
-        return view('admin.dashboard', compact('stats', 'recent_activities'));
+        return view('admin.dashboard', compact(
+            'totalContacts', 'unreadContacts', 'todayContacts', 'weekContacts', 'monthContacts', 'contactsGrowth',
+            'totalPartners', 'pendingPartners', 'approvedPartners', 'rejectedPartners', 'todayPartners', 'weekPartners', 'partnersGrowth',
+            'totalTechnicians', 'pendingTechnicians', 'approvedTechnicians', 'rejectedTechnicians', 'todayTechnicians', 'weekTechnicians', 'techniciansGrowth',
+            'recentActivities'
+        ));
     }
 }

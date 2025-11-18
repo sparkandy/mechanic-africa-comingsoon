@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ContactManagementController;
 use App\Http\Controllers\Admin\PartnerManagementController;
 use App\Http\Controllers\Admin\TechnicianManagementController;
+use App\Http\Controllers\Admin\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,5 +69,8 @@ Route::prefix('admin')->group(function () {
             Route::post('/{id}/status', [TechnicianManagementController::class, 'updateStatus'])->name('admin.technicians.status');
             Route::delete('/{id}', [TechnicianManagementController::class, 'destroy'])->name('admin.technicians.destroy');
         });
+        
+        // Reports
+        Route::get('/reports', [ReportController::class, 'index'])->name('admin.reports');
     });
 });

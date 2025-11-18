@@ -13,11 +13,40 @@ class TechnicianManagementController extends Controller
         $query = Technician::query()->orderBy('created_at', 'desc');
 
         // Filter by status
-        if ($request->has('status') && $request->status != '') {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $technicians = $query->paginate(20);
+        // Filter by date range
+        if ($request->filled('date_range')) {
+            switch ($request->date_range) {
+                case 'today':
+                    $query->whereDate('created_at', today());
+                    break;
+                case 'week':
+                    $query->where('created_at', '>=', now()->startOfWeek());
+                    break;
+                case 'month':
+                    $query->where('created_at', '>=', now()->startOfMonth());
+                    break;
+                case 'year':
+                    $query->where('created_at', '>=', now()->startOfYear());
+                    break;
+            }
+        }
+
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('specialization', 'like', "%{$search}%");
+            });
+        }
+
+        $technicians = $query->paginate(20)->withQueryString();
         
         return view('admin.technicians.index', compact('technicians'));
     }

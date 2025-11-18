@@ -18,22 +18,42 @@
 
 <div class="card">
     <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
-        <form action="{{ route('admin.partners.index') }}" method="GET" style="display: flex; gap: 12px; align-items: end;">
+        <form action="{{ route('admin.partners.index') }}" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: end;">
             <div>
                 <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px;">
-                    Filter by Status
+                    Status
                 </label>
-                <select name="status" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
-                    <option value="">All Applications</option>
+                <select name="status" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
+                    <option value="">All Status</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
                     <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
                 </select>
             </div>
-            <button type="submit" class="btn-primary">Apply Filter</button>
-            @if(request('status'))
-                <a href="{{ route('admin.partners.index') }}" class="btn-secondary">Clear</a>
-            @endif
+            <div>
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px;">
+                    Date Range
+                </label>
+                <select name="date_range" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
+                    <option value="">All Time</option>
+                    <option value="today" {{ request('date_range') === 'today' ? 'selected' : '' }}>Today</option>
+                    <option value="week" {{ request('date_range') === 'week' ? 'selected' : '' }}>This Week</option>
+                    <option value="month" {{ request('date_range') === 'month' ? 'selected' : '' }}>This Month</option>
+                    <option value="year" {{ request('date_range') === 'year' ? 'selected' : '' }}>This Year</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px;">
+                    Search
+                </label>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Workshop, owner, email..." style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn-primary" style="flex: 1;">Apply Filters</button>
+                @if(request()->hasAny(['status', 'date_range', 'search']))
+                    <a href="{{ route('admin.partners.index') }}" class="btn-secondary">Clear</a>
+                @endif
+            </div>
         </form>
     </div>
 

@@ -1,15 +1,15 @@
 @extends('admin.layout')
 
-@section('title', 'Contact Details')
+@section('title', 'Service Request Details')
 
 @section('content')
 <div class="content-header">
     <div>
-        <h1>Contact Details</h1>
-        <p class="subtitle">View and manage contact submission</p>
+        <h1>Service Request Details</h1>
+        <p class="subtitle">View and manage service request submission</p>
     </div>
     <div>
-        <a href="{{ route('admin.contacts.index') }}" class="btn-secondary">← Back to Contacts</a>
+        <a href="{{ route('admin.contacts.index') }}" class="btn-secondary">← Back to Service Requests</a>
     </div>
 </div>
 
@@ -117,11 +117,11 @@
     </div>
 
     <div style="padding: 24px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
-        <form action="{{ route('admin.contacts.destroy', $contact->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this contact? This action cannot be undone.');">
+        <form action="{{ route('admin.contacts.destroy', $contact->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this service request? This action cannot be undone.');">
             @csrf
             @method('DELETE')
             <button type="submit" style="background: #dc2626; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 14px;">
-                Delete Contact
+                Delete Service Request
             </button>
         </form>
     </div>

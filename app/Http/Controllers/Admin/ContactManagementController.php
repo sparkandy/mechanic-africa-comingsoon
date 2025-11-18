@@ -13,11 +13,40 @@ class ContactManagementController extends Controller
         $query = Contact::query()->orderBy('created_at', 'desc');
 
         // Filter by status
-        if ($request->has('status') && $request->status != '') {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $contacts = $query->paginate(20);
+        // Filter by date range
+        if ($request->filled('date_range')) {
+            switch ($request->date_range) {
+                case 'today':
+                    $query->whereDate('created_at', today());
+                    break;
+                case 'week':
+                    $query->where('created_at', '>=', now()->startOfWeek());
+                    break;
+                case 'month':
+                    $query->where('created_at', '>=', now()->startOfMonth());
+                    break;
+                case 'year':
+                    $query->where('created_at', '>=', now()->startOfYear());
+                    break;
+            }
+        }
+
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('message', 'like', "%{$search}%");
+            });
+        }
+
+        $contacts = $query->paginate(20)->withQueryString();
         
         return view('admin.contacts.index', compact('contacts'));
     }
@@ -44,7 +73,7 @@ class ContactManagementController extends Controller
         
         $contact->update(['status' => $request->status]);
         
-        return redirect()->back()->with('success', 'Contact status updated successfully');
+        return redirect()->back()->with('success', 'Service request status updated successfully');
     }
 
     public function destroy($id)
@@ -52,6 +81,6 @@ class ContactManagementController extends Controller
         $contact = Contact::findOrFail($id);
         $contact->delete();
         
-        return redirect()->route('admin.contacts.index')->with('success', 'Contact deleted successfully');
+        return redirect()->route('admin.contacts.index')->with('success', 'Service request deleted successfully');
     }
 }

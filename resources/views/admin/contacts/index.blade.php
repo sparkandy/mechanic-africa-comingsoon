@@ -1,11 +1,11 @@
 @extends('admin.layout')
 
-@section('title', 'Contact Management')
+@section('title', 'Service Requests Management')
 
 @section('content')
 <div class="content-header">
     <div>
-        <h1>Contact Management</h1>
+        <h1>Service Requests Management</h1>
         <p class="subtitle">Manage customer service requests</p>
     </div>
 </div>
@@ -18,22 +18,42 @@
 
 <div class="card">
     <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
-        <form action="{{ route('admin.contacts.index') }}" method="GET" style="display: flex; gap: 12px; align-items: end;">
+        <form action="{{ route('admin.contacts.index') }}" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: end;">
             <div>
                 <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px;">
-                    Filter by Status
+                    Status
                 </label>
-                <select name="status" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
-                    <option value="">All Contacts</option>
+                <select name="status" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
+                    <option value="">All Status</option>
                     <option value="unread" {{ request('status') === 'unread' ? 'selected' : '' }}>Unread</option>
                     <option value="read" {{ request('status') === 'read' ? 'selected' : '' }}>Read</option>
                     <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>Archived</option>
                 </select>
             </div>
-            <button type="submit" class="btn-primary">Apply Filter</button>
-            @if(request('status'))
-                <a href="{{ route('admin.contacts.index') }}" class="btn-secondary">Clear</a>
-            @endif
+            <div>
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px;">
+                    Date Range
+                </label>
+                <select name="date_range" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
+                    <option value="">All Time</option>
+                    <option value="today" {{ request('date_range') === 'today' ? 'selected' : '' }}>Today</option>
+                    <option value="week" {{ request('date_range') === 'week' ? 'selected' : '' }}>This Week</option>
+                    <option value="month" {{ request('date_range') === 'month' ? 'selected' : '' }}>This Month</option>
+                    <option value="year" {{ request('date_range') === 'year' ? 'selected' : '' }}>This Year</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px;">
+                    Search
+                </label>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Name, email, phone..." style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn-primary" style="flex: 1;">Apply Filters</button>
+                @if(request()->hasAny(['status', 'date_range', 'search']))
+                    <a href="{{ route('admin.contacts.index') }}" class="btn-secondary">Clear</a>
+                @endif
+            </div>
         </form>
     </div>
 
@@ -82,7 +102,7 @@
                 @empty
                     <tr>
                         <td colspan="7" style="text-align: center; color: #6b7280; padding: 40px;">
-                            No contacts found.
+                            No service requests found.
                         </td>
                     </tr>
                 @endforelse

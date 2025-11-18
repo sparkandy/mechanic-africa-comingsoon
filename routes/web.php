@@ -5,12 +5,14 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\TechnicianController;
+use App\Http\Controllers\WaitlistController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ContactManagementController;
 use App\Http\Controllers\Admin\PartnerManagementController;
 use App\Http\Controllers\Admin\TechnicianManagementController;
+use App\Http\Controllers\Admin\WaitlistManagementController;
 use App\Http\Controllers\Admin\ReportController;
 
 /*
@@ -33,6 +35,9 @@ Route::post('/submit-partner', [PartnerController::class, 'submit'])->name('part
 
 // Technician Application
 Route::post('/submit-technician', [TechnicianController::class, 'submit'])->name('technician.submit');
+
+// Waitlist Submission
+Route::post('/submit-waitlist', [WaitlistController::class, 'submit'])->name('waitlist.submit');
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +77,13 @@ Route::prefix('admin')->group(function () {
             Route::get('/{id}', [TechnicianManagementController::class, 'show'])->name('admin.technicians.show');
             Route::post('/{id}/status', [TechnicianManagementController::class, 'updateStatus'])->name('admin.technicians.status');
             Route::delete('/{id}', [TechnicianManagementController::class, 'destroy'])->name('admin.technicians.destroy');
+        });
+        
+        // Waitlist Management
+        Route::prefix('waitlist')->group(function () {
+            Route::get('/', [WaitlistManagementController::class, 'index'])->name('admin.waitlist.index');
+            Route::delete('/{id}', [WaitlistManagementController::class, 'destroy'])->name('admin.waitlist.destroy');
+            Route::get('/export', [WaitlistManagementController::class, 'export'])->name('admin.waitlist.export');
         });
         
         // Reports

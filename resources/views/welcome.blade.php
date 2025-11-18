@@ -109,7 +109,7 @@
                     <a href="#contact-form?plan=4-cylinders" class="buy-button" style="display: block; text-align: center; text-decoration: none;">Buy Plan Now</a>
                 </div>
                 <div class="pricing-card">
-                    <h3>7 - Cylinder</h3>
+                    <h3>6 - Cylinder</h3>
                     <div class="price">₦70,000</div>
                     <p class="pricing-note">Other service offering at no cost</p>
                     <ul class="features-list">
@@ -280,10 +280,69 @@
             <div class="cta-banner-content">
                 <h2>Your Car Deserves Expert Care.<br>Protect It Today</h2>
                 <p>Join thousands of Nigerian drivers who trust Mechanic Africa for reliable maintenance and professional service delivery.</p>
-                <a href="#" class="waitlist-button">Join our Waitlist</a>
+                <a href="#waitlist-modal" class="waitlist-button" onclick="openWaitlistModal(); return false;">Join our Waitlist</a>
             </div>
         </div>
     </section>
+
+    <!-- Waitlist Modal -->
+    <div id="waitlist-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeWaitlistModal()">&times;</span>
+            <h2>Join Our Waitlist</h2>
+            <p>Be the first to know when we launch in your area!</p>
+            
+            @if(session('waitlist_success'))
+                <div class="alert alert-success">
+                    {{ session('waitlist_success') }}
+                </div>
+            @endif
+            
+            @if(session('waitlist_error'))
+                <div class="alert alert-error">
+                    {{ session('waitlist_error') }}
+                </div>
+            @endif
+            
+            <form action="{{ route('waitlist.submit') }}" method="POST" id="waitlist-form">
+                @csrf
+                
+                <div class="form-group">
+                    <label for="waitlist_name">Full Name *</label>
+                    <input type="text" id="waitlist_name" name="name" value="{{ old('name') }}" required>
+                    @error('name')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                
+                <div class="form-group">
+                    <label for="waitlist_email">Email Address *</label>
+                    <input type="email" id="waitlist_email" name="email" value="{{ old('email') }}" required>
+                    @error('email')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                
+                <div class="form-group">
+                    <label for="waitlist_phone">Phone Number</label>
+                    <input type="tel" id="waitlist_phone" name="phone" value="{{ old('phone') }}" placeholder="+234 XXX XXX XXXX">
+                    @error('phone')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                
+                <div class="form-group">
+                    <label for="waitlist_city">City</label>
+                    <input type="text" id="waitlist_city" name="city" value="{{ old('city') }}" placeholder="e.g., Lagos, Abuja">
+                    @error('city')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                
+                <button type="submit" class="btn-submit">Join Waitlist</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer>
@@ -772,6 +831,161 @@
                 margin-bottom: 16px;
             }
         }
+
+        /* Waitlist Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-content h2 {
+            color: #EF4444;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .modal-content p {
+            color: #6B7280;
+            margin-bottom: 30px;
+        }
+
+        .close {
+            color: #6B7280;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            background: #F3F4F6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+
+        .close:hover,
+        .close:focus {
+            background: #EF4444;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #1F2937;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #EF4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #9CA3AF;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: #EF4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: #DC2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background-color: #D1FAE5;
+            border: 1px solid #6EE7B7;
+            color: #047857;
+        }
+
+        .alert-error {
+            background-color: #FEE2E2;
+            border: 1px solid #FECACA;
+            color: #DC2626;
+        }
+
+        .error-message {
+            color: #DC2626;
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 10% auto;
+                padding: 24px;
+            }
+
+            .modal-content h2 {
+                font-size: 22px;
+            }
+        }
     </style>
 
     <script>
@@ -970,6 +1184,39 @@
                 location.reload();
             }, 300);
         }
+
+        // Waitlist Modal Functions
+        function openWaitlistModal() {
+            document.getElementById('waitlist-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWaitlistModal() {
+            document.getElementById('waitlist-modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const waitlistModal = document.getElementById('waitlist-modal');
+            if (event.target == waitlistModal) {
+                closeWaitlistModal();
+            }
+        }
+
+        // Auto-open waitlist modal if there's a success or error message
+        @if(session('waitlist_success') || session('waitlist_error'))
+            window.onload = function() {
+                openWaitlistModal();
+                
+                @if(session('waitlist_success'))
+                    // Auto-close after 3 seconds on success
+                    setTimeout(function() {
+                        closeWaitlistModal();
+                    }, 3000);
+                @endif
+            }
+        @endif
     </script>
 </body>
 </html>

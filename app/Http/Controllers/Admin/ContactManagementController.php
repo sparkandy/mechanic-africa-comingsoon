@@ -17,6 +17,11 @@ class ContactManagementController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Filter by package
+        if ($request->filled('package')) {
+            $query->where('package', $request->package);
+        }
+
         // Filter by date range
         if ($request->filled('date_range')) {
             switch ($request->date_range) {
@@ -42,6 +47,7 @@ class ContactManagementController extends Controller
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('car', 'like', "%{$search}%")
                   ->orWhere('message', 'like', "%{$search}%");
             });
         }

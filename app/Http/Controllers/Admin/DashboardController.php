@@ -19,6 +19,13 @@ class DashboardController extends Controller
         $weekContacts = Contact::where('created_at', '>=', Carbon::now()->startOfWeek())->count();
         $monthContacts = Contact::where('created_at', '>=', Carbon::now()->startOfMonth())->count();
         
+        // Package breakdown
+        $packageStats = [
+            '4-cylinders' => Contact::where('package', '4-cylinders')->count(),
+            '6-cylinders' => Contact::where('package', '6-cylinders')->count(),
+            '8-cylinders' => Contact::where('package', '8-cylinders')->count(),
+        ];
+        
         // Partners Statistics
         $totalPartners = Partner::count();
         $pendingPartners = Partner::where('status', 'pending')->count();
@@ -89,7 +96,7 @@ class DashboardController extends Controller
             ->take(10);
 
         return view('admin.dashboard', compact(
-            'totalContacts', 'unreadContacts', 'todayContacts', 'weekContacts', 'monthContacts', 'contactsGrowth',
+            'totalContacts', 'unreadContacts', 'todayContacts', 'weekContacts', 'monthContacts', 'contactsGrowth', 'packageStats',
             'totalPartners', 'pendingPartners', 'approvedPartners', 'rejectedPartners', 'todayPartners', 'weekPartners', 'partnersGrowth',
             'totalTechnicians', 'pendingTechnicians', 'approvedTechnicians', 'rejectedTechnicians', 'todayTechnicians', 'weekTechnicians', 'techniciansGrowth',
             'recentActivities'

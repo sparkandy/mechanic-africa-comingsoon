@@ -104,16 +104,40 @@
                 </label>
                 <p style="font-size: 16px; color: #111827;">{{ $contact->created_at->format('M d, Y h:i A') }}</p>
             </div>
+            
+            <div>
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+                    Service Package
+                </label>
+                <p style="font-size: 16px; color: #111827;">
+                    @if($contact->package)
+                        <span class="badge" style="background: #ede9fe; color: #7c3aed; font-size: 14px; padding: 6px 12px;">
+                            {{ ucwords(str_replace('-', ' ', $contact->package)) }}
+                        </span>
+                    @else
+                        <span style="color: #9ca3af;">Not specified</span>
+                    @endif
+                </p>
+            </div>
+            
+            <div>
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+                    Car Information
+                </label>
+                <p style="font-size: 16px; color: #111827;">{{ $contact->car ?? 'Not specified' }}</p>
+            </div>
         </div>
 
+        @if($contact->message)
         <div>
             <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
-                Message
+                Additional Message
             </label>
             <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; font-size: 15px; color: #111827; line-height: 1.6;">
                 {{ $contact->message }}
             </div>
         </div>
+        @endif
     </div>
 
     <div style="padding: 24px; border-top: 1px solid #e5e7eb; background: #f9fafb;">

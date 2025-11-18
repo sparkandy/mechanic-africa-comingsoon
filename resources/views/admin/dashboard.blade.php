@@ -40,6 +40,34 @@
             <div class="stat-value">{{ $monthContacts }}</div>
         </div>
     </div>
+    
+    <!-- Package Breakdown -->
+    <div style="margin-top: 20px;">
+        <h3 style="font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 12px;">Package Breakdown</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div style="font-size: 12px; font-weight: 600; opacity: 0.9; margin-bottom: 8px;">4 CYLINDERS</div>
+                <div style="font-size: 28px; font-weight: 800;">{{ $packageStats['4-cylinders'] }}</div>
+                <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">
+                    {{ $totalContacts > 0 ? round(($packageStats['4-cylinders'] / $totalContacts) * 100, 1) : 0 }}% of total
+                </div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                <div style="font-size: 12px; font-weight: 600; opacity: 0.9; margin-bottom: 8px;">6 CYLINDERS</div>
+                <div style="font-size: 28px; font-weight: 800;">{{ $packageStats['6-cylinders'] }}</div>
+                <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">
+                    {{ $totalContacts > 0 ? round(($packageStats['6-cylinders'] / $totalContacts) * 100, 1) : 0 }}% of total
+                </div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                <div style="font-size: 12px; font-weight: 600; opacity: 0.9; margin-bottom: 8px;">8 CYLINDERS</div>
+                <div style="font-size: 28px; font-weight: 800;">{{ $packageStats['8-cylinders'] }}</div>
+                <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">
+                    {{ $totalContacts > 0 ? round(($packageStats['8-cylinders'] / $totalContacts) * 100, 1) : 0 }}% of total
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Partners Stats -->

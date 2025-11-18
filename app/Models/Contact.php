@@ -13,6 +13,8 @@ class Contact extends Model
         'name',
         'email',
         'phone',
+        'package',
+        'car',
         'message',
         'ip_address',
         'status',

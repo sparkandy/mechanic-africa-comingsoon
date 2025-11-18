@@ -128,7 +128,9 @@
             <div class="top-bar">
                 <div>
                     <strong>{{ session('admin_username') }}</strong>
-                    <span style="color: #6B7280; font-size: 14px;">({{ ucfirst(session('admin_role')) }})</span>
+                    @if(session('admin_role'))
+                        <span style="color: #6B7280; font-size: 14px;">({{ ucfirst(session('admin_role')) }})</span>
+                    @endif
                 </div>
                 <div class="user-info">
                     <div class="user-avatar">{{ strtoupper(substr(session('admin_username'), 0, 1)) }}</div>

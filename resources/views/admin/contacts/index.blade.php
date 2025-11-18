@@ -32,6 +32,17 @@
             </div>
             <div>
                 <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px;">
+                    Package
+                </label>
+                <select name="package" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
+                    <option value="">All Packages</option>
+                    <option value="4-cylinders" {{ request('package') === '4-cylinders' ? 'selected' : '' }}>4 Cylinders</option>
+                    <option value="6-cylinders" {{ request('package') === '6-cylinders' ? 'selected' : '' }}>6 Cylinders</option>
+                    <option value="8-cylinders" {{ request('package') === '8-cylinders' ? 'selected' : '' }}>8 Cylinders</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px;">
                     Date Range
                 </label>
                 <select name="date_range" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
@@ -46,11 +57,11 @@
                 <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px;">
                     Search
                 </label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Name, email, phone..." style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Name, email, phone, car..." style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 100%;">
             </div>
             <div style="display: flex; gap: 8px;">
                 <button type="submit" class="btn-primary" style="flex: 1;">Apply Filters</button>
-                @if(request()->hasAny(['status', 'date_range', 'search']))
+                @if(request()->hasAny(['status', 'package', 'date_range', 'search']))
                     <a href="{{ route('admin.contacts.index') }}" class="btn-secondary">Clear</a>
                 @endif
             </div>
@@ -64,7 +75,8 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
-                    <th>Message Preview</th>
+                    <th>Package</th>
+                    <th>Car</th>
                     <th>Status</th>
                     <th>Submitted</th>
                     <th>Actions</th>
@@ -76,9 +88,18 @@
                         <td style="font-weight: 500; color: #111827;">{{ $contact->name }}</td>
                         <td>{{ $contact->email }}</td>
                         <td>{{ $contact->phone }}</td>
-                        <td style="max-width: 300px;">
+                        <td>
+                            @if($contact->package)
+                                <span class="badge" style="background: #ede9fe; color: #7c3aed; font-size: 12px;">
+                                    {{ ucwords(str_replace('-', ' ', $contact->package)) }}
+                                </span>
+                            @else
+                                <span style="color: #9ca3af; font-size: 13px;">—</span>
+                            @endif
+                        </td>
+                        <td style="max-width: 200px;">
                             <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                {{ Str::limit($contact->message, 50) }}
+                                {{ $contact->car ?? '—' }}
                             </div>
                         </td>
                         <td>
@@ -101,7 +122,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="text-align: center; color: #6b7280; padding: 40px;">
+                        <td colspan="8" style="text-align: center; color: #6b7280; padding: 40px;">
                             No service requests found.
                         </td>
                     </tr>

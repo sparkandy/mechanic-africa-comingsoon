@@ -182,7 +182,7 @@
                         <div class="contact-icon">📍</div>
                         <div class="contact-text">
                             <h4>Location</h4>
-                            <p>enters across Africa coming soon</p>
+                            <p>Centers across Africa coming soon</p>
                         </div>
                     </div>
                     <div class="contact-item">

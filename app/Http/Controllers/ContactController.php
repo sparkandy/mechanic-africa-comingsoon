@@ -15,7 +15,7 @@ class ContactController extends Controller
             'name' => 'required|string|max:100',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:50',
-            'package' => 'required|in:4-cylinders,7-cylinders,8-cylinders',
+            'package' => 'required|in:4-cylinders,6-cylinders,8-cylinders',
             'car' => 'required|string|max:200',
             'message' => 'nullable|string|max:1000',
             'g-recaptcha-response' => 'required',
@@ -37,12 +37,9 @@ class ContactController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'message' => sprintf(
-                    "Package: %s\nCar: %s\nMessage: %s",
-                    $request->package,
-                    $request->car,
-                    $request->message ?? 'N/A'
-                ),
+                'package' => $request->package,
+                'car' => $request->car,
+                'message' => $request->message,
                 'ip_address' => $request->ip(),
                 'status' => 'unread',
             ]);

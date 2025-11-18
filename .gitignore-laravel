@@ -1,0 +1,75 @@
+# Laravel specific
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
+
+# Docker
+/mysql_data
+
+# Backups
+/laravel-migration-backup
+
+# Old project files (backup before deleting)
+/index-old-*.html
+/index-old-*.php
+/index-backup-*.php
+
+# SQLite databases
+*.db
+*.db-journal
+
+# Logs
+*.log
+/storage/logs/*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build files
+/public/css/app.css
+/public/js/app.js
+/public/mix-manifest.json
+
+# Testing
+/coverage
+/.phpunit.cache
+
+# Composer
+composer.phar
+/vendor/
+
+# NPM
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel Mix
+/public/mix-manifest.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.buildpath
+.settings/
+
+# Deployment
+/bootstrap/cache/*

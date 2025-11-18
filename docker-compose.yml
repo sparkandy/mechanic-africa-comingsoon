@@ -1,15 +1,63 @@
+version: '3.8'
+
 services:
-  mechanic-africa:
-    build: .
-    container_name: mechanic-africa-web
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: mechanic-africa-nginx
     ports:
-      - "9000:80"
-    restart: unless-stopped
+      - "8080:80"
     volumes:
-      - ./:/app:rw
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+      - mysql
     networks:
       - mechanic-network
+    restart: unless-stopped
+
+  # PHP-FPM
+  php:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    container_name: mechanic-africa-php
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - mechanic-network
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=mechanic_africa
+      - DB_USERNAME=mechanic_user
+      - DB_PASSWORD=mechanic_secure_pass_2025
+    restart: unless-stopped
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: mechanic-africa-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: mechanic_africa
+      MYSQL_USER: mechanic_user
+      MYSQL_PASSWORD: mechanic_secure_pass_2025
+      MYSQL_ROOT_PASSWORD: root_secure_pass_2025
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mechanic-network
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
 
 networks:
   mechanic-network:
     driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
